@@ -1,20 +1,38 @@
 #(©)AnimeXyz
 
+import asyncio
+import aiohttp
+import traceback
 from aiohttp import web
 from plugins import web_server
-
 import pyromod.listen
 from pyrogram import Client
 from pyrogram.enums import ParseMode
-import sys
+import os, sys
 from datetime import datetime
-
 from config import API_HASH, APP_ID, LOGGER, TG_BOT_TOKEN, TG_BOT_WORKERS, FORCE_SUB_CHANNEL, FORCE_SUB_CHANNEL2, CHANNEL_ID, PORT
 
+
+URL = os.getenv("URL", "https://filestoreok-45690f7bf82c.herokuapp.com/"))
 
 name ="""
  BY MIKEY FROM TG
 """
+
+async def ping_server():
+    while True:
+        await asyncio.sleep(PING)
+        try:
+            async with aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=10)
+            ) as session:
+                async with session.get(URL) as resp:
+                    logging.info(f"Pinged server with response: {resp.status}")
+        except asyncio.TimeoutError:
+            print("Couldn't connect to the site URL..!")
+        except Exception:
+            traceback.print_exc()
+
 
 
 class Bot(Client):
@@ -92,6 +110,7 @@ class Bot(Client):
         await app.setup()
         bind_address = "0.0.0.0"
         await web.TCPSite(app, bind_address, PORT).start()
+        asyncio.create_task(ping_server())
 
     async def stop(self, *args):
         await super().stop()
